@@ -6,6 +6,7 @@ return
 		'width' => 'Largeur du lecteur',
 		'updates' => 'Vous pouvez trouver la dernière mise à jour de l’extension sur ',
         'show_content' => 'Ajouter également le contenu du flux',
-        'instance' => 'Instance invidious <br /> (URL sans "http://" ni "/" à la fin)',
+        'instance' => 'Instance invidious',
+        'youtube_link_text' => 'Regarder sur YouTube',
   ),
 );

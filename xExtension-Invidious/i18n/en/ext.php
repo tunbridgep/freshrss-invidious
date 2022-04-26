@@ -5,7 +5,8 @@ return array(
 		'height' => 'Player height',
         'width' => 'Player width',
         'updates' => 'You can find the latest extension version at',
-        'show_content' => 'Additionally display the feeds content',
-        'instance' => 'Invidious instance <br /> (URL without "http://" nor ending "/")',
+        'show_content' => 'Additionally display a YouTube link',
+        'instance' => 'Invidious instance',
+        'youtube_link_text' => 'Watch on YouTube',
 	),
 );

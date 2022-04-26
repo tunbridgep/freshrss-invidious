@@ -3,9 +3,11 @@
 /**
  * Class InvidiousExtension
  *
- * Latest version can be found at https://github.com/Korbak/freshrss-invidious
+ * Based on https://github.com/Korbak/freshrss-invidious
+ * With extensions from https://github.com/cn-tools/freshrss-invidious
+ * Latest version can be found at https://github.com/tunbridgep/freshrss-invidious
  *
- * @author Korbak forking Kevin Papst
+ * @author Paul Tunbridge forking Korbak forking Kevin Papst
  */
 class InvidiousExtension extends Minz_Extension
 {
@@ -28,7 +30,12 @@ class InvidiousExtension extends Minz_Extension
      * Invidious instance to use
      * @var string
      */
-    protected $instance = 'invidio.us';
+    protected $instance = 'yewtu.be';
+    /**
+     * The text for the YouTube link
+     * @var string
+     */
+    protected $youtube_link_text = 'Youtube Link';
 
     /**
      * Initialize this extension
@@ -60,51 +67,9 @@ class InvidiousExtension extends Minz_Extension
         }
         if (FreshRSS_Context::$user_conf->in_player_instance != '') {
             $this->instance = FreshRSS_Context::$user_conf->in_player_instance;
+            $this->sanitizeInstanceURL();
         }
-    }
-
-    /**
-     * Returns the width in pixel for the invidious player iframe.
-     * You have to call loadConfigValues() before this one, otherwise you get default values.
-     *
-     * @return int
-     */
-    public function getWidth()
-    {
-        return $this->width;
-    }
-
-    /**
-     * Returns the height in pixel for the invidious player iframe.
-     * You have to call loadConfigValues() before this one, otherwise you get default values.
-     *
-     * @return int
-     */
-    public function getHeight()
-    {
-        return $this->height;
-    }
-
-    /**
-     * Returns whether this extensions displays the content of the invidious feed.
-     * You have to call loadConfigValues() before this one, otherwise you get default values.
-     *
-     * @return bool
-     */
-    public function isShowContent()
-    {
-        return $this->showContent;
-    }
-    
-    /**
-     * Returns which invidious instance is used by the extension.
-     * You have to call loadConfigValues() before this one, otherwise you get default values.
-     *
-     * @return string
-     */
-    public function getInstance()
-    {
-        return $this->instance;
+        $this->youtube_link_text = _t('ext.in_videos.youtube_link_text');
     }
 
     /**
@@ -115,72 +80,72 @@ class InvidiousExtension extends Minz_Extension
      */
     public function embedInvidiousVideo($entry)
     {
+        $this->loadConfigValues();
         $link = $entry->link();
+        $instance_link = $this->getInstanceLinkFromYoutubeLink($link);
 
-        $html = $this->getIFrameForLink($link);
-        if ($html === null) {
-            return $entry;
-        }
+        if ($this->isInvidiousURL($instance_link))
+        {
+            $embed_link = $this->getEmbedLink($instance_link);
+            $html = $this->getIFrameHtml($embed_link);
 
-        if ($this->showContent) {
-            $html .= $entry->content();
-        }
+            if ($this->showContent) {
+                $html .= $this->getNiceYoutubeLinkText($link);
+            }
+            
+            $entry->_content($html);
+            $in_url = $instance_link;
+            $entry->_link($in_url);
 
-        $entry->_content($html);
-        $in_url = $this->youtubeToInvidious($entry);
-        $entry->_link($in_url);
+        } 
+        
+        //DEBUG CODE
+        //$url_info = parse_url($instance_link);
+        //$hostname = $url_info['host'];
+        //$html = "<p>".$instance_link." - ".$this->instance." - ".$hostname."</p>";
+        //$entry->_content($html);
         return $entry;
     }
 
-    /**
-     * Replaces all YouTube href links for Invidious links in RSS feeds
-     *
-     * @param FreshRSS_Feed $feed
-     * @return $in_url 
-     */
-    public function youtubeToInvidious($entry)
+    //Check if the base URL of an entry is an invidious URL
+    private function isInvidiousURL(string $url): bool 
     {
-        $yt_url = $entry->link();
-        if (stripos($yt_url, 'www.youtube.com') != false) {
-            $in_url = str_replace('//www.youtube.com/', '//' . $this->instance . '/', $yt_url);
-        } else if (stripos($yt_url, 'invidio.us') != false) {
-            $in_url = str_replace('//invidio.us/', '//' . $this->instance . '/', $yt_url);
-        }
-        $in_url = str_replace('http://', 'https://', $in_url);
-        return $in_url;
+        $url_info = parse_url($url);
+        $hostname = $url_info['host']; //base URL, which should be invidious instance
+        $hostname = str_replace("www.","",$hostname);
+        
+        return $hostname == $this->instance || $hostname == "yewtu.be";
+    }
+    
+    //Get the embed link for an invidious video
+    private function getEmbedLink(string $invidious_url): string
+    {
+        return str_replace($this->instance,$this->instance."/embed",$invidious_url);
     }
 
-    /**
-     * Returns an HTML <iframe> for a given Youtube watch URL (www.youtube.com/watch?v=)
-     *
-     * @param string $link
-     * @return string
-     */
-    public function getIFrameForLink($link)
+    //Get a formatted "Watch on Youtube" link
+    private function getNiceYoutubeLinkText(string $link)
     {
-        $this->loadConfigValues();
-
-        if (stripos($link, 'www.youtube.com/watch?v=') != false) {
-            $url = str_replace('//www.youtube.com/watch?v=', '//' . $this->instance . '/embed/', $link);
-        } else if (stripos($link, 'invidio.us/watch?v=') != false) {
-            $url = str_replace('//invidio.us/watch?v=', '//' . $this->instance . '/embed/', $link);
-        } else {
-            return null;
-        }
-        $url = str_replace('http://', 'https://', $url);
-        $html = $this->getIFrameHtml($url);
-
-        return $html;
+        return '<p><a target="_blank" rel="noreferrer" href="'.$link.'">'.$this->youtube_link_text.'</a></p>';
     }
-
+    
+    //Get an invidious link from our youtube link
+    private function getInstanceLinkFromYoutubeLink(string $youtube_url): string
+    {
+        $base_url = str_replace("youtube.com",$this->instance,$youtube_url);
+        $watch_url = str_replace("watch?v=","",$base_url);
+        return $watch_url;
+    }
+    
     /**
      * Returns an HTML <iframe> for a given URL for the configured width and height.
      *
      * @param string $url
      * @return string
      */
-    public function getIFrameHtml($url)
+    private function getIFrameHtml($url)
     {
+    
         return '<iframe 
                 style="height: ' . $this->height . 'px; width: ' . $this->width . 'px;" 
                 width="' . $this->width . '" 
@@ -188,6 +153,15 @@ class InvidiousExtension extends Minz_Extension
                 src="' . $url . '" 
                 frameborder="0" 
                 allowfullscreen></iframe>';
+    }
+    
+    //removes everything but the basename from the instance URL, as well as the trailing slash
+    private function sanitizeInstanceURL()
+    {
+        $url_info = parse_url($this->instance);
+        $hostname = $url_info['host']; 
+        if ($hostname != "")
+            $this->instance = $hostname;
     }
 
     /**
