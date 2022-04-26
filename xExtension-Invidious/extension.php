@@ -98,12 +98,6 @@ class InvidiousExtension extends Minz_Extension
             $entry->_link($in_url);
 
         } 
-        
-        //DEBUG CODE
-        //$url_info = parse_url($instance_link);
-        //$hostname = $url_info['host'];
-        //$html = "<p>".$instance_link." - ".$this->instance." - ".$hostname."</p>";
-        //$entry->_content($html);
         return $entry;
     }
 
@@ -126,7 +120,11 @@ class InvidiousExtension extends Minz_Extension
     //Get a formatted "Watch on Youtube" link
     private function getNiceYoutubeLinkText(string $link)
     {
-        return '<p><a target="_blank" rel="noreferrer" href="'.$link.'">'.$this->youtube_link_text.'</a></p>';
+        //just in case it's originally an invidious feed, we need to make sure it's using the youtube url
+        $yt_url = str_replace($this->instance,"youtube.com",$link);
+        $yt_url = str_replace("yewtu.be","youtube.com",$link);
+    
+        return '<p><a target="_blank" rel="noreferrer" href="'.$yt_url.'">'.$this->youtube_link_text.'</a></p>';
     }
     
     //Get an invidious link from our youtube link
