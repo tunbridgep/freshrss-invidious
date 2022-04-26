@@ -122,7 +122,7 @@ class InvidiousExtension extends Minz_Extension
     {
         //just in case it's originally an invidious feed, we need to make sure it's using the youtube url
         $yt_url = str_replace($this->instance,"youtube.com",$link);
-        $yt_url = str_replace("yewtu.be","youtube.com",$link);
+        $yt_url = str_replace("yewtu.be","youtube.com",$yt_url);
     
         return '<p><a target="_blank" rel="noreferrer" href="'.$yt_url.'">'.$this->youtube_link_text.'</a></p>';
     }
