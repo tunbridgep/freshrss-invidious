@@ -1,7 +1,7 @@
 # Updated 2022
 
 This fork has been updated from the original version and enhanced with new features, including:
-- Replaced [indivio.us](indivio.us) with [yewtu.be](yewtu.be) as the default instance, because [invidio.us](invidio.us) is defunct
+- Replaced [indivio.us](http://indivio.us) with [yewtu.be](http://yewtu.be) as the default instance, because [invidio.us](invidio.us) is defunct
 - Added embeds for invidious videos when the feed is directly from an invidious instance, rather than youtube
 - Added a "Watch on Youtube" link to allow watching videos on YouTube in cases where invidious doesn't work properly or is slow (optional, enable in settings)
 - Base URL is no longer required in settings. You can now use a full invidious instance URL
