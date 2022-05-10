@@ -4,5 +4,5 @@
 	"description": "Embed YouTube feeds inside article content, but with Invidious.",
 	"version": 1.1,
 	"entrypoint": "Invidious",
-	"type": "system"
+	"type": "user"
 }
