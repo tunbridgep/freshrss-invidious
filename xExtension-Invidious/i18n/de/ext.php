@@ -8,5 +8,6 @@ return array(
         'show_content' => 'Zeige zusätzlich den Inhalt des Feeds an',
         'instance' => 'Invidious Instanz',
         'youtube_link_text' => 'Auf YouTube ansehen',
+        'replace_global' => 'Youtube-Einbettungen in allen Feeds ersetzen',
 	),
 );

@@ -8,5 +8,6 @@ return array(
         'show_content' => 'Additionally display a YouTube link',
         'instance' => 'Invidious instance',
         'youtube_link_text' => 'Watch on YouTube',
+        'replace_global' => 'Replace Youtube embeds in all feeds',
 	),
 );

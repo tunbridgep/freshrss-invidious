@@ -8,5 +8,6 @@ return
         'show_content' => 'Ajouter également le contenu du flux',
         'instance' => 'Instance invidious',
         'youtube_link_text' => 'Regarder sur YouTube',
+        'replace_global' => 'Remplacer les intégrations Youtube dans tous les flux',
   ),
 );
