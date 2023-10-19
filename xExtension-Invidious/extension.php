@@ -87,6 +87,14 @@ class InvidiousExtension extends Minz_Extension
         $this->youtube_link_text = _t('ext.in_videos.youtube_link_text');
     }
 
+    public function appendYoutubeLink($html,$link)
+    {
+        if ($this->showContent) {
+            $html .= $this->getNiceYoutubeLinkText($link);
+        }
+        return $html;
+    }
+
     public function handleInvidious($entry)
     {
         $this->loadConfigValues();
@@ -99,10 +107,7 @@ class InvidiousExtension extends Minz_Extension
             $embed_link = $this->getEmbedLink($link);
             $html = $this->getIFrameHtml($embed_link);
             $html .= '<p>'.$this->getVideoDescriptionFromFeed($entry)."</p>";
-            
-            if ($this->showContent) {
-                $html .= $this->getNiceYoutubeLinkText($link);
-            }
+            $this->appendYoutubeLink($html,$link);
             
             $entry->_content($html);
         }
@@ -118,10 +123,7 @@ class InvidiousExtension extends Minz_Extension
             $embed_link = $this->getEmbedLink($invidious_link);
             $html = $this->getIFrameHtml($embed_link);
             $html .= '<p>'.$this->getVideoDescriptionFromInstance($invidious_link)."</p>";
-            
-            if ($this->showContent) {
-                $html .= $this->getNiceYoutubeLinkText($link);
-            }
+            $this->appendYoutubeLink($html,$link);
             
             $entry->_link($invidious_link);
             $entry->_content($html);
@@ -214,9 +216,8 @@ class InvidiousExtension extends Minz_Extension
     //Get an invidious link from our youtube link
     private function getInstanceLinkFromYoutubeLink(string $youtube_url): string
     {
-        $base_url = str_replace("youtube.com",$this->instance,$youtube_url);
-        $base_url = str_replace("youtube-nocookie.com",$this->instance,$base_url); 
-        $watch_url = str_replace("watch?v=","",$base_url);
+        $watch_url = str_replace("youtube.com",$this->instance,$youtube_url);
+        $watch_url = str_replace("youtube-nocookie.com",$this->instance,$watch_url); 
         return $watch_url;
     }
     
